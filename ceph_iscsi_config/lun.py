@@ -617,7 +617,8 @@ class LUN(object):
             new_lun = UserBackedStorageObject(name=self.config_key,
                                               config=cfgstring,
                                               size=self.size_bytes,
-                                              wwn=in_wwn)
+                                              wwn=in_wwn,
+                                              max_data_area_mb=settings.config.max_data_area_mb)
         except RTSLibError as err:
             self.error = True
             self.error_msg = ("failed to add {} to LIO - "
@@ -625,6 +626,11 @@ class LUN(object):
                                                 str(err)))
             self.logger.error(self.error_msg)
             return None
+
+        if new_lun.max_data_area_mb is None:
+            self.logger.warning("Could not set max_data_area_mb for {}."
+                                "Kernel does not support this feature.".
+                                format(self.config_key))
 
         try:
             new_lun.set_attribute("cmd_time_out", 0)
