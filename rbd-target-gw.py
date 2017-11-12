@@ -463,6 +463,7 @@ if __name__ == '__main__':
     # api classes
     config = Config(logger)
     if config.error:
-        halt("Unable to open/read the configuration object")
+        logger.critical("Unable to open/read the configuration object")
+        sys.exit(16)
     else:
         main()
