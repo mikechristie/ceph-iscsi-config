@@ -103,6 +103,7 @@ class Settings(object):
                        "max_recv_data_segment_length": 262144,
                        "max_xmit_data_segment_length": 262144,
                        "max_data_area_mb" : 8,
+                       "hw_max_sectors" : 512,
                        "alua_failover_type" : "implicit"
                        }
 

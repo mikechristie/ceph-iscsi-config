@@ -250,6 +250,21 @@ class LUN(object):
         if self.config_key in self.config.config['disks']:
             self.controls = self.config.config['disks'][self.config_key].get('controls', {}).copy()
 
+    def _get_hw_max_sectors(self):
+        hw_max_sectors = self.controls.get('hw_max_sectors', None)
+        if hw_max_sectors is None:
+            return settings.config.hw_max_sectors
+        return hw_max_sectors
+
+    def _set_hw_max_sectors(self, value):
+        if value is None or str(value) == str(settings.config.hw_max_sectors):
+            self.controls.pop('hw_max_sectors', None)
+        else:
+            self.controls['hw_max_sectors'] = value
+
+    hw_max_sectors = property(_get_hw_max_sectors, _set_hw_max_sectors,
+                                doc="get/set max IO size in sectors")
+
     def _get_max_data_area_mb(self):
         max_data_area_mb = self.controls.get('max_data_area_mb', None)
         if max_data_area_mb is None:
@@ -658,7 +673,7 @@ class LUN(object):
 
         # extract control parameter overrides (if any) or use default
         controls = self.controls.copy()
-        for k in ['max_data_area_mb']:
+        for k in ['max_data_area_mb', 'hw_max_sectors']:
             if controls.get(k, None) is None:
                 controls[k] = getattr(settings.config, k, None)
 
