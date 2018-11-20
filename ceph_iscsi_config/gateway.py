@@ -372,13 +372,13 @@ class GWTarget(GWObject):
             group_name = alua_format_group_name(tpg,
                                                 settings.config.alua_failover_type,
                                                 is_owner)
-            # someone mapped a LU then unmapped it without deleting the
-            # stg_object, or we are reloading the config.
+            # The group did not get deleted possibly due to a crash.
+            # Delete the alua group and rebuild it in case we have new
+            # settings and defaults to apply.
             alua_tpg = ALUATargetPortGroup(stg_object, group_name)
-            if alua_tpg.tpg_id != tpg.tag:
-                # ports and owner were rearranged. Not sure we support that.
-                raise CephiSCSIInval("Existing ALUA group tag for group {} "
-                                     "in invalid state.\n".format(group_name))
+            alua_tpg.delete()
+            alua_tpg = alua_create_group(settings.config.alua_failover_type,
+                                         tpg, stg_object, is_owner)
 
             # drop down in case we are restarting due to error and we
             # were not able to bind to a lun last time.
